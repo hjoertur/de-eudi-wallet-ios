@@ -211,6 +211,8 @@ final class ConsentViewModel<Router: RouterHost>: BaseRequestViewModel<Router> {
   private func getLocalizedFieldName(_ fieldName: String) -> String {
     // Map backend field names to localization keys
     switch fieldName.lowercased() {
+    case "vehicle_category_code":
+      return "Licence category"
     case "birth_date", "birthdate", "date_of_birth":
       return LocalizableStringKey.dateOfBirth.toString
     case "first_name", "given_name", "givennames":

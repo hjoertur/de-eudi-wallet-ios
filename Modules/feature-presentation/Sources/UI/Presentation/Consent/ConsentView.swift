@@ -133,12 +133,14 @@ struct ConsentView<Router: RouterHost>: View {
   private func consentListView(items: [ConsentItem], showDetails: Bool) -> some View {
     VStack(alignment: .leading, spacing: DSStyle.Spacers.SPACING_LARGE_MEDIUM) {
       if showDetails {
-        ForEach(items.indices, id: \.self) { index in
-          let item = items[index]
-          ConsentItemView(
-            title: LocalizableStringKey.dynamic(key: item.title).toString,
-            detail: item.description
-          )
+        LazyVGrid(columns: columns, alignment: .leading, spacing: DSStyle.Spacers.SPACING_MEDIUM) {
+          ForEach(items.indices, id: \.self) { index in
+            let item = items[index]
+            ConsentItemView(
+              title: LocalizableStringKey.dynamic(key: item.title).toString,
+              detail: item.description
+            )
+          }
         }
         .transition(.opacity.combined(with: .move(edge: .top)))
         
