@@ -93,7 +93,7 @@ public final class SecureEnclaveControllerImpl: SecureEnclaveController {
     guard let keyTag = keyTag.value.data(using: .utf8) else { return nil }
     guard let accessControl = makePrivateKeyAccessControl() else { return nil }
 
-    let attributes: [String: Any] = [
+    var attributes: [String: Any] = [
       kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
       kSecAttrKeySizeInBits as String: 256,
       kSecAttrTokenID as String: kSecAttrTokenIDSecureEnclave,
@@ -103,6 +103,7 @@ public final class SecureEnclaveControllerImpl: SecureEnclaveController {
         kSecAttrAccessControl as String: accessControl
       ]
     ]
+    if LocalSimulatorSettings.enabled { attributes.removeValue(forKey: kSecAttrTokenID as String) }
     var error: Unmanaged<CFError>?
     guard let privateKey = SecKeyCreateRandomKey(attributes as CFDictionary, &error) else {
       logger?.e("Error creating private key: \(error!.takeRetainedValue())")
@@ -120,7 +121,7 @@ public final class SecureEnclaveControllerImpl: SecureEnclaveController {
     guard let keyTag = keyTag.value.data(using: .utf8) else { return false }
     guard let accessControl = makePrivateKeyAccessControl() else { return false }
 
-    let query: [String: Any] = [
+    var query: [String: Any] = [
       kSecClass as String: kSecClassKey,
       kSecAttrApplicationTag as String: keyTag,
       kSecValueRef as String: privateKey,
@@ -130,6 +131,7 @@ public final class SecureEnclaveControllerImpl: SecureEnclaveController {
       kSecAttrAccessControl as String: accessControl
     ]
 
+    if LocalSimulatorSettings.enabled { query.removeValue(forKey: kSecAttrTokenID as String) }
     let status = SecItemAdd(query as CFDictionary, nil)
     if status != errSecSuccess {
       logger?.e("Error saving private key to keychain: \(status)")
@@ -142,7 +144,7 @@ public final class SecureEnclaveControllerImpl: SecureEnclaveController {
   // MARK: - Fetch Private Key from Keychain
   public func retrievePrivateKey(with keyTag: SecureEnclaveKeys) -> SecKey? {
     guard let keyTag = keyTag.value.data(using: .utf8) else { return nil }
-    let query: [String: Any] = [
+    var query: [String: Any] = [
       kSecClass as String: kSecClassKey,
       kSecAttrApplicationTag as String: keyTag,
       kSecAttrKeyType as String: kSecAttrKeyTypeECSECPrimeRandom,
@@ -151,6 +153,7 @@ public final class SecureEnclaveControllerImpl: SecureEnclaveController {
       kSecReturnRef as String: true
     ]
 
+    if LocalSimulatorSettings.enabled { query.removeValue(forKey: kSecAttrTokenID as String) }
     var item: CFTypeRef?
     let status = SecItemCopyMatching(query as CFDictionary, &item)
 
@@ -324,8 +327,8 @@ public final class SecureEnclaveControllerImpl: SecureEnclaveController {
     let accessControl = SecAccessControlCreateWithFlags(
       nil,
       // Protecting this secure enclave key with passcode-backed access control for private-key use
-      kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-      [.privateKeyUsage],
+      LocalSimulatorSettings.enabled ? kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly : kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+      LocalSimulatorSettings.enabled ? [] : [.privateKeyUsage],
       &error
     )
     if let error {

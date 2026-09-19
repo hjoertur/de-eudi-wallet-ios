@@ -107,6 +107,11 @@ final class DashboardCredentialViewModel<Router: RouterHost>: ViewModel<Router, 
   }
 
   private func setIssuerName(_ doc: DocClaimsDecodable) {
+    if doc.id == LocalMockPID.id {
+      pidName = "Mock ID — Erika Mustermann"
+      pidIssuer = "Trustables local simulation"
+      return
+    }
     let isPID = doc.configurationIdentifier?.contains("pid") ?? false
     pidName = isPID ? LocalizableStringKey.dashboardCardTitle.toString : ""
     pidIssuer = isPID ? LocalizableStringKey.dashboardCardIssuer.toString : ""

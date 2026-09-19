@@ -16,6 +16,7 @@
 import SwiftUI
 import logic_ui
 import logic_resources
+import logic_business
 
 struct DashboardView<Router: RouterHost>: View {
 
@@ -67,10 +68,27 @@ struct DashboardView<Router: RouterHost>: View {
   
   @ViewBuilder
   private var overviewContent: some View {
+    VStack(spacing: 0) {
+      if LocalSimulatorSettings.enabled {
+        Toggle("Use mock ID — Erika Mustermann", isOn: Binding(
+          get: { viewModel.hasMockPID },
+          set: { enabled in Task { await viewModel.setMockPID(enabled) } }
+        ))
+        .accessibilityIdentifier("trustablesMockPIDToggle")
+        .disabled(viewModel.mockPIDBusy)
+        .padding()
+        Text("Local UI simulation · cannot be used for verification")
+          .font(.caption)
+          .padding(.horizontal)
+        if let error = viewModel.mockPIDError {
+          Text(error).foregroundStyle(.red).padding()
+        }
+      }
       if viewModel.viewState.hasIssuedDocuments {
       viewModel.viewState.credentialsTab.eraseToAnyView()
     } else {
       viewModel.viewState.addDocumentTab?.eraseToAnyView()
+    }
     }
   }
 }

@@ -199,6 +199,8 @@ final class WalletKitControllerImpl: WalletKitController {
   }
   
   func loadDocuments() async throws {
+    try await LocalMockPID.seed(in: wallet)
+    try await LocalE2EPID.seed(in: wallet)
     _ = try await wallet.loadAllDocuments()
   }
   

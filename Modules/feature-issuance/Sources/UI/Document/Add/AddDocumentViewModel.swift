@@ -32,7 +32,7 @@ public struct AddDocumentViewState: ViewState {
   }
 
   var isLoading: Bool {
-    addDocumentCellModels.allSatisfy { $0.isLoading }
+    !addDocumentCellModels.isEmpty && addDocumentCellModels.allSatisfy { $0.isLoading }
   }
 }
 
@@ -95,6 +95,7 @@ public final class AddDocumentViewModel<Router: RouterHost>: ViewModel<Router, A
     case .failure(let error):
       setState {
         $0.copy(
+          addDocumentCellModels: transformCellLoadingState(with: false),
           error: .init(
             description: .custom(error.localizedDescription),
             cancelAction: self.pop(),

@@ -158,7 +158,12 @@ struct WalletKitConfigImpl: WalletKitConfig {
     guard let certificateURLs = Bundle.main.urls(forResourcesWithExtension: "der", subdirectory: "Wallet/Certificates") else {
       return .init(trustedCerts: [])
     }
-    return .init(trustedCerts: certificateURLs.compactMap { try? Data(contentsOf: $0) })
+    var certificates = certificateURLs.compactMap { try? Data(contentsOf: $0) }
+    if LocalE2EPID.enabled, let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
+       let testReader = try? Data(contentsOf: documents.appendingPathComponent("northline-test-reader.der")) {
+      certificates.append(testReader)
+    }
+    return .init(trustedCerts: certificates)
   }
 
   var documentStorageServiceName: String {

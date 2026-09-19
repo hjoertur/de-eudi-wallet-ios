@@ -47,7 +47,7 @@ final class DashboardInteractorImpl: DashboardInteractor {
   }
   
   func getPIDDocument() throws -> DocClaimsDecodable? {
-    walletKitController.fetchIssuedDocuments(with: [.mDocPid]).last
+    walletKitController.fetchMainPidDocument()
   }
   
   func clearFirstRunFlag() {

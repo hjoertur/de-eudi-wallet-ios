@@ -31,6 +31,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    if LocalSimulatorSettings.enabled {
+      clearPinSession()
+      return true
+    }
     FirebaseApp.configure()
     clearPinSession()
     initializeReporting()

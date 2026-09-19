@@ -80,6 +80,31 @@ final class DashboardViewModel<Router: RouterHost>: ViewModel<Router, DashboardS
 
   @Published var selectedTab: DashboardTab = .overview
   @Published var shouldPresentQRReader: Bool = false
+  @Published var mockPIDBusy = false
+  @Published var mockPIDError: String?
+
+  var hasMockPID: Bool {
+    dashboardInteractor.getWalletKitController().fetchDocument(with: LocalMockPID.id) != nil
+  }
+
+  func setMockPID(_ enabled: Bool) async {
+    guard LocalSimulatorSettings.enabled, !mockPIDBusy else { return }
+    mockPIDBusy = true
+    mockPIDError = nil
+    defer { mockPIDBusy = false }
+    let wallet = dashboardInteractor.getWalletKitController().wallet
+    do {
+      if enabled {
+        try await LocalMockPID.seed(in: wallet, requestedByUser: true)
+      } else {
+        try await wallet.deleteDocument(id: LocalMockPID.id, status: .issued)
+      }
+      _ = try await wallet.loadAllDocuments()
+      onAppear()
+    } catch {
+      mockPIDError = error.localizedDescription
+    }
+  }
   
   init(
     router: Router,

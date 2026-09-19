@@ -89,7 +89,7 @@ final class PresentationInteractorImpl: PresentationInteractor {
         DocumentTypeIdentifier.sdJwtPid.rawValue
       ]
       return walletKitController.fetchDocuments(with: documentIDs).contains { doc in
-        pidDocTypes.contains(doc.docType)
+        pidDocTypes.contains(doc.docType) && !(LocalE2EPID.enabled && doc.id == LocalE2EPID.id)
       }
     }
   

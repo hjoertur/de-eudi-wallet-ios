@@ -15,6 +15,18 @@
  */
 import Foundation
 
+/// Explicit opt-in for the local Trustables lab. Never enabled on a physical device.
+public enum LocalSimulatorSettings {
+  public static var enabled: Bool {
+#if targetEnvironment(simulator)
+    AppBuildVariant.current == .DEV &&
+      ProcessInfo.processInfo.environment["TRUSTABLES_LOCAL_SIMULATION"] == "1"
+#else
+    false
+#endif
+  }
+}
+
 public enum AppBuildType: String, @unchecked Sendable {
   case RELEASE, DEBUG
 }
@@ -84,7 +96,8 @@ public struct ConfigLogicImpl: ConfigLogic {
   private let debugOverrides: DebugConfigOverrides
 
   public var walletHostUrl: String {
-    debugOverrides.walletHostURL ?? getBundleValue(key: "WALLET_HOST_URL")
+    if LocalSimulatorSettings.enabled { return "http://localhost:8080" }
+    return debugOverrides.walletHostURL ?? getBundleValue(key: "WALLET_HOST_URL")
   }
 
   public var walletOTLPURL: String {
