@@ -249,8 +249,12 @@ final class WalletKitControllerImpl: WalletKitController {
   }
   
   func fetchMainPidDocument() -> DocClaimsDecodable? {
-    return fetchIssuedDocuments(with: [DocumentTypeIdentifier.mDocPid, DocumentTypeIdentifier.sdJwtPid])
-      .sorted { $0.createdAt > $1.createdAt }.last
+    let documents = fetchIssuedDocuments(with: [DocumentTypeIdentifier.mDocPid, DocumentTypeIdentifier.sdJwtPid])
+    if LocalE2EPID.enabled {
+      return documents.first { $0.configurationIdentifier == "trustables-e2e-pid" }
+        ?? documents.sorted { $0.createdAt > $1.createdAt }.first
+    }
+    return documents.sorted { $0.createdAt > $1.createdAt }.last
   }
   
   func fetchIssuedDocuments(excluded: [DocumentTypeIdentifier]) -> [DocClaimsDecodable] {

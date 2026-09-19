@@ -16,7 +16,7 @@ xcrun simctl bootstatus "$device" -b
 open -a "$DEVELOPER_DIR/Applications/Simulator.app"
 app=$(find "$build_dir/Build/Products/DevDebug-iphonesimulator" -maxdepth 1 -name '*.app' -print -quit)
 test -n "$app"
-/usr/libexec/PlistBuddy -c 'Set :CFBundleDisplayName d-you Local' "$app/Info.plist"
+/usr/libexec/PlistBuddy -c 'Set :CFBundleDisplayName d-you' "$app/Info.plist"
 /usr/libexec/PlistBuddy -c 'Delete :NSAppTransportSecurity:NSAllowsLocalNetworking' "$app/Info.plist" 2>/dev/null || true
 /usr/libexec/PlistBuddy -c 'Add :NSAppTransportSecurity:NSAllowsLocalNetworking bool true' "$app/Info.plist"
 codesign --force --sign - "$app"

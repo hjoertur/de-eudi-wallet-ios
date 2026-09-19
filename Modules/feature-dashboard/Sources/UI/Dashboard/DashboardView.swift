@@ -17,6 +17,7 @@ import SwiftUI
 import logic_ui
 import logic_resources
 import logic_business
+import logic_core
 
 struct DashboardView<Router: RouterHost>: View {
 
@@ -69,8 +70,8 @@ struct DashboardView<Router: RouterHost>: View {
   @ViewBuilder
   private var overviewContent: some View {
     VStack(spacing: 0) {
-      if LocalSimulatorSettings.enabled {
-        Toggle("Use mock ID — Erika Mustermann", isOn: Binding(
+      if LocalSimulatorSettings.enabled && !LocalE2EPID.enabled {
+        Toggle("Use mock ID — Hjörtur Hjartarson", isOn: Binding(
           get: { viewModel.hasMockPID },
           set: { enabled in Task { await viewModel.setMockPID(enabled) } }
         ))

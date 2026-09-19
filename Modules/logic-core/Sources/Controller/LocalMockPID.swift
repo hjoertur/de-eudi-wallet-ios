@@ -5,16 +5,16 @@ import logic_business
 
 /// A UI fixture, deliberately without a holder key: it cannot be presented.
 public enum LocalMockPID {
-  public static let id = "trustables-local-mock-erika-mustermann"
+  public static let id = "trustables-local-mock-hjortur-hjartarson"
 
   public static func seed(in wallet: EudiWallet, requestedByUser: Bool = false) async throws {
     guard LocalSimulatorSettings.enabled,
-          requestedByUser || ProcessInfo.processInfo.environment["TRUSTABLES_MOCK_PID"] == "erika" else { return }
+          requestedByUser || ProcessInfo.processInfo.environment["TRUSTABLES_MOCK_PID"] == "hjortur" else { return }
     guard try await wallet.loadDocument(id: id, status: .issued) == nil else { return }
 
     let claims: [(String, Any)] = [
-      ("given_name", "Erika"), ("family_name", "Mustermann"),
-      ("birthdate", "1964-08-12"), ("nationalities", ["DE"]),
+      ("given_name", "Hjörtur"), ("family_name", "Hjartarson"),
+      ("birthdate", "1988-03-16"), ("nationalities", ["DE"]),
       ("age_over_18", true), ("issuing_country", "DE"),
       ("issuing_authority", "Trustables local simulation — MOCK"),
       ("mock_credential", true)
@@ -45,14 +45,14 @@ public enum LocalMockPID {
     let metadata = DocMetadata(
       credentialIssuerIdentifier: "https://mock-issuer.example.invalid",
       configurationIdentifier: "trustables-mock-pid", docType: "urn:eudi:pid:de:1",
-      display: [.init(name: "MOCK — Erika Mustermann", localeIdentifier: "en")],
+      display: [.init(name: "MOCK — Hjörtur Hjartarson", localeIdentifier: "en")],
       issuerDisplay: [.init(name: "Trustables local simulation — MOCK", localeIdentifier: "en")],
       claims: [], authorizedRequestData: nil, keyOptions: nil, credentialOptions: nil
     )
     let document = WalletStorage.Document(
       id: id, docType: "urn:eudi:pid:de:1", docDataFormat: .sdjwt,
       data: Data(compact.utf8), docKeyInfo: nil, createdAt: .now,
-      metadata: metadata.toData(), displayName: "MOCK — Erika Mustermann", status: .issued
+      metadata: metadata.toData(), displayName: "MOCK — Hjörtur Hjartarson", status: .issued
     )
     try await wallet.endIssueDocument(document, batch: nil)
   }

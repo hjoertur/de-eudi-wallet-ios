@@ -107,8 +107,13 @@ final class DashboardCredentialViewModel<Router: RouterHost>: ViewModel<Router, 
   }
 
   private func setIssuerName(_ doc: DocClaimsDecodable) {
+    if doc.configurationIdentifier == "trustables-e2e-pid" {
+      pidName = "Digital ID"
+      pidIssuer = "Digital Identity Service"
+      return
+    }
     if doc.id == LocalMockPID.id {
-      pidName = "Mock ID — Erika Mustermann"
+      pidName = "Mock ID — Hjörtur Hjartarson"
       pidIssuer = "Trustables local simulation"
       return
     }
